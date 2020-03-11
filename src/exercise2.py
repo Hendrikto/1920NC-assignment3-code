@@ -58,3 +58,29 @@ def calculate_roc_auc_scores(jar_path, alphabet_path, train_path, test_path, y_t
             auc_scores[n - 1, r - 1] = auc_score
             print(f'ROC AUC score ({n=}, {r=}): {auc_score:.4f}')
     return auc_scores
+
+
+def plot_roc_auc_scores(scores):
+    mean_score = np.nanmean(scores)
+    n_max = scores.shape[0]
+
+    plt.figure()
+    plt.title('ROC AUC Scores')
+    plt.xlabel('$r$')
+    plt.ylabel('$n$')
+    plt.xticks(range(n_max), range(1, n_max + 1))
+    plt.yticks(range(n_max), range(1, n_max + 1))
+    plt.imshow(scores)
+    for n in range(n_max):
+        for r in range(n + 1):
+            auc_score = scores[n, r]
+            plt.text(
+                r, n,
+                f'{auc_score:.4f}',
+                color='white' if auc_score < mean_score else 'black',
+                ha='center',
+                va='center',
+            )
+    plt.colorbar()
+    plt.show()
+    plt.close()
