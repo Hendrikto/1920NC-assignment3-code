@@ -1,5 +1,6 @@
 import subprocess
 from argparse import ArgumentParser
+from functools import partial
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -50,11 +51,11 @@ def plot_roc(y_true, y_pred, n, r):
     plt.close()
 
 
-def calculate_roc_auc_scores(jar_path, alphabet_path, train_path, test_path, y_true, n_max):
+def calculate_roc_auc_scores(negsel, y_true, n_max):
     auc_scores = np.full((n_max,) * 2, np.nan)
     for n in range(1, n_max + 1):
         for r in range(1, n + 1):
-            output = run_negsel(jar_path, alphabet_path, train_path, test_path, n, r)
+            output = negsel(n=n, r=r)
             scores = aggregate_scores(output)
             auc_score = roc_auc_score(y_true, scores)
             auc_scores[n - 1, r - 1] = auc_score
@@ -136,12 +137,12 @@ if __name__ == '__main__':
         n_max = min(map(len, train_file)) - 1
         print('Inferred max n:', n_max)
 
-    roc_auc_scores = calculate_roc_auc_scores(
+    negsel = partial(
+        run_negsel,
         args.jar_path,
         args.data_dir / args.alphabet_file,
         args.data_dir / args.train_file,
         args.data_dir / args.test_file,
-        y_true,
-        n_max,
     )
+    roc_auc_scores = calculate_roc_auc_scores(negsel, y_true, n_max)
     plot_roc_auc_scores(roc_auc_scores)
