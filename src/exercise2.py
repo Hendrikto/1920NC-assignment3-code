@@ -1,4 +1,6 @@
 import subprocess
+from argparse import ArgumentParser
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -84,3 +86,41 @@ def plot_roc_auc_scores(scores):
     plt.colorbar()
     plt.show()
     plt.close()
+
+
+parser = ArgumentParser()
+parser.add_argument(
+    '--alphabet',
+    type=Path,
+    default='snd-cert.alpha',
+    dest='alphabet_file',
+)
+parser.add_argument(
+    '--data_dir',
+    type=Path,
+    default='negative-selection/syscalls/snd-cert',
+)
+parser.add_argument(
+    '--jar',
+    type=Path,
+    default='negative-selection/negsel2.jar',
+    dest='jar_path',
+)
+parser.add_argument(
+    '--label',
+    type=Path,
+    default='snd-cert.1.labels',
+    dest='label_file',
+)
+parser.add_argument(
+    '--test',
+    type=Path,
+    default='snd-cert.1.test',
+    dest='test_file',
+)
+parser.add_argument(
+    '--train',
+    type=Path,
+    default='snd-cert.train',
+    dest='train_file',
+)
