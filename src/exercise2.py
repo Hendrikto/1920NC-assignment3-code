@@ -124,3 +124,24 @@ parser.add_argument(
     default='snd-cert.train',
     dest='train_file',
 )
+
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+
+    y_true = np.loadtxt(args.data_dir / args.label_file, dtype=np.bool)
+
+    with open(args.data_dir / args.train_file) as train_file:
+        # smallest line length, excluding '\n'
+        n_max = min(map(len, train_file)) - 1
+        print('Inferred max n:', n_max)
+
+    roc_auc_scores = calculate_roc_auc_scores(
+        args.jar_path,
+        args.data_dir / args.alphabet_file,
+        args.data_dir / args.train_file,
+        args.data_dir / args.test_file,
+        y_true,
+        n_max,
+    )
+    plot_roc_auc_scores(roc_auc_scores)
