@@ -146,3 +146,8 @@ if __name__ == '__main__':
     )
     roc_auc_scores = calculate_roc_auc_scores(negsel, y_true, n_max)
     plot_roc_auc_scores(roc_auc_scores)
+
+    n, r = np.unravel_index(np.nanargmax(roc_auc_scores), roc_auc_scores.shape)
+    n += 1
+    r += 1
+    plot_roc(y_true, aggregate_scores(negsel(n, r)), n, r)
