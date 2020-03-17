@@ -57,14 +57,18 @@ def plot_roc(y_true, y_pred, n, r, save_path=None):
 
 def calculate_roc_auc_scores(negsel, y_true, n_max):
     auc_scores = np.full((n_max,) * 2, np.nan)
+    best_auc_score = 0
     for n in range(1, n_max + 1):
         for r in range(1, n + 1):
             output = negsel(n=n, r=r)
             scores = aggregate_scores(output)
             auc_score = roc_auc_score(y_true, scores)
             auc_scores[n - 1, r - 1] = auc_score
+            if auc_score > best_auc_score:
+                best_auc_score = auc_score
+                best_negsel_scores = scores
             print(f'ROC AUC score ({n=}, {r=}): {auc_score:.4f}')
-    return auc_scores
+    return auc_scores, best_negsel_scores
 
 
 def plot_roc_auc_scores(scores, save_path=None):
@@ -159,10 +163,10 @@ if __name__ == '__main__':
         args.data_dir / args.train_file,
         args.data_dir / args.test_file,
     )
-    roc_auc_scores = calculate_roc_auc_scores(negsel, y_true, n_max)
+    roc_auc_scores, best_negsel_scores = calculate_roc_auc_scores(negsel, y_true, n_max)
     plot_roc_auc_scores(roc_auc_scores, save_path=plot_path.format('scores'))
 
     n, r = np.unravel_index(np.nanargmax(roc_auc_scores), roc_auc_scores.shape)
     n += 1
     r += 1
-    plot_roc(y_true, aggregate_scores(negsel(n, r)), n, r, save_path=plot_path.format('roc'))
+    plot_roc(y_true, best_negsel_scores, n, r, save_path=plot_path.format('roc'))
