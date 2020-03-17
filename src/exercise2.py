@@ -37,7 +37,7 @@ def aggregate_scores(output):
     return scores
 
 
-def plot_roc(y_true, y_pred, n, r):
+def plot_roc(y_true, y_pred, n, r, save_path=None):
     roc = roc_curve(y_true, y_pred)
 
     plt.figure()
@@ -47,6 +47,10 @@ def plot_roc(y_true, y_pred, n, r):
     plt.plot((0, 1), (0, 1), linestyle='--')
     plt.plot(roc[0], roc[1], label=f'ROC curve (AUC = {auc(roc[0], roc[1]):.4f})')
     plt.legend()
+
+    if save_path is not None:
+        plt.savefig(save_path)
+
     plt.show()
     plt.close()
 
@@ -63,7 +67,7 @@ def calculate_roc_auc_scores(negsel, y_true, n_max):
     return auc_scores
 
 
-def plot_roc_auc_scores(scores):
+def plot_roc_auc_scores(scores, save_path=None):
     mean_score = np.nanmean(scores)
     n_max = scores.shape[0]
 
@@ -85,6 +89,10 @@ def plot_roc_auc_scores(scores):
                 va='center',
             )
     plt.colorbar()
+
+    if save_path is not None:
+        plt.savefig(save_path)
+
     plt.show()
     plt.close()
 
@@ -129,6 +137,13 @@ parser.add_argument(
 
 if __name__ == '__main__':
     args = parser.parse_args()
+    problem_name, problem_nr = args.test_file.stem.split('.')
+    plot_path = ''.join((
+        'plots/exercise2-',
+        problem_name.replace('-', '_'),
+        problem_nr,
+        '-{}.pdf',
+    ))
 
     y_true = np.loadtxt(args.data_dir / args.label_file, dtype=np.bool)
 
@@ -145,9 +160,9 @@ if __name__ == '__main__':
         args.data_dir / args.test_file,
     )
     roc_auc_scores = calculate_roc_auc_scores(negsel, y_true, n_max)
-    plot_roc_auc_scores(roc_auc_scores)
+    plot_roc_auc_scores(roc_auc_scores, save_path=plot_path.format('scores'))
 
     n, r = np.unravel_index(np.nanargmax(roc_auc_scores), roc_auc_scores.shape)
     n += 1
     r += 1
-    plot_roc(y_true, aggregate_scores(negsel(n, r)), n, r)
+    plot_roc(y_true, aggregate_scores(negsel(n, r)), n, r, save_path=plot_path.format('roc'))
