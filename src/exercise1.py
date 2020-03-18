@@ -1,5 +1,6 @@
 import subprocess
 from functools import partial
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 from sklearn.metrics import (
@@ -69,8 +70,8 @@ def exercise_1_1(negsel):
     """
     y_true, y_score = num_matches(
         negsel,
-        r'negative-selection\english.test',
-        r'negative-selection\tagalog.test',
+        Path('negative-selection/english.test'),
+        Path('negative-selection/tagalog.test'),
         4,
     )
 
@@ -104,7 +105,7 @@ def compute_aucs(negsel, non_self_path):
     for r in range(1, 11):
         y_true, y_score = num_matches(
             negsel,
-            r'negative-selection\english.test',
+            Path('negative-selection/english.test'),
             non_self_path,
             r,
         )
@@ -142,7 +143,7 @@ def exercise_1_2(negsel):
     Args:
         negsel = [fn] function to run the negative selection algorithm
     """
-    areas = compute_aucs(negsel, r'negative-selection\tagalog.test')
+    areas = compute_aucs(negsel, Path('negative-selection/tagalog.test'))
     plot_aucs([areas], ['tagalog'])
 
 
@@ -154,10 +155,10 @@ def exercise_1_3(negsel):
         negsel = [fn] function to run the negative selection algorithm
     """
     languages = ['xhosa', 'hiligaynon', 'plautdietsch', 'middle-english']
-    non_self_path = r'negative-selection\lang\{}.txt'
+    non_self_dir = Path('negative-selection/lang')
     areas = []
     for language in languages:
-        areas.append(compute_aucs(negsel, non_self_path.format(language)))
+        areas.append(compute_aucs(negsel, non_self_dir / f'{language}.txt'))
 
     plot_aucs(areas, languages)
 
@@ -165,8 +166,8 @@ def exercise_1_3(negsel):
 if __name__ == '__main__':
     negsel = partial(
         run_negsel,
-        r'negative-selection\negsel2.jar',
-        r'negative-selection\english.train',
+        Path('negative-selection/negsel2.jar'),
+        Path('negative-selection/english.train'),
     )
 
     exercise_1_1(negsel)
