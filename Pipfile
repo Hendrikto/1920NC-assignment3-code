@@ -1,0 +1,20 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+flake8 = "*"
+flake8-commas = "*"
+flake8-quotes = "*"
+isort = "*"
+
+[packages]
+deap = "*"
+matplotlib = "*"
+numpy = "*"
+scikit-learn = "*"
+tqdm = "*"
+
+[requires]
+python_version = "3.8"
